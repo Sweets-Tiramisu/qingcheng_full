@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>spu管理</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- 上传图片框样式，不使用上传组件可以删除此样式 -->
+    <style>
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 150px;
+            height: 70px;
+            line-height: 150px;
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 70px;
+            display: block;
+        }
+
+    </style>
+</head>
+<body class="hold-transition">
+<div id="app">
+
+    <div class="content-header">
+        <h1>管理<small>spu管理</small></h1>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>管理</el-breadcrumb-item>
+            <el-breadcrumb-item>spu管理</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+
+    <div class="app-container">
+        <div class="box">
+            <div class="filter-container">
+                <!--查询表单-->
+                <el-form :inline="true" >
+                          <el-form-item label="货号">
+<el-input v-model="searchMap.sn" placeholder="货号" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="SPU名">
+<el-input v-model="searchMap.name" placeholder="SPU名" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="副标题">
+<el-input v-model="searchMap.caption" placeholder="副标题" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="品牌ID">
+<el-input v-model="searchMap.brandId" placeholder="品牌ID" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="一级分类">
+<el-input v-model="searchMap.category1Id" placeholder="一级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="二级分类">
+<el-input v-model="searchMap.category2Id" placeholder="二级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="三级分类">
+<el-input v-model="searchMap.category3Id" placeholder="三级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="模板ID">
+<el-input v-model="searchMap.templateId" placeholder="模板ID" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="运费模板id">
+<el-input v-model="searchMap.freightId" placeholder="运费模板id" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="图片">
+<el-input v-model="searchMap.image" placeholder="图片" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="图片列表">
+<el-input v-model="searchMap.images" placeholder="图片列表" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="售后服务">
+<el-input v-model="searchMap.saleService" placeholder="售后服务" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="介绍">
+<el-input v-model="searchMap.introduction" placeholder="介绍" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="规格列表">
+<el-input v-model="searchMap.specItems" placeholder="规格列表" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="参数列表">
+<el-input v-model="searchMap.paraItems" placeholder="参数列表" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="销量">
+<el-input v-model="searchMap.saleNum" placeholder="销量" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="评论数">
+<el-input v-model="searchMap.commentNum" placeholder="评论数" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="是否上架">
+<el-input v-model="searchMap.isMarketable" placeholder="是否上架" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="是否启用规格">
+<el-input v-model="searchMap.isEnableSpec" placeholder="是否启用规格" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="是否删除">
+<el-input v-model="searchMap.isDelete" placeholder="是否删除" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="审核状态">
+<el-input v-model="searchMap.status" placeholder="审核状态" class="filter-item" ></el-input></el-form-item>
+
+                <el-button class="dalfBut" @click="fetchData()">查询</el-button>
+                <el-button type="primary"  class="butT" @click="formVisible=true;pojo={}">新增</el-button>
+                </el-form>
+            </div>
+
+            <el-table :data="tableData" border style="width: 100%">
+                          <el-table-column prop="id" label="主键" width="80"></el-table-column>
+          <el-table-column prop="sn" label="货号" width="80"></el-table-column>
+          <el-table-column prop="name" label="SPU名" width="80"></el-table-column>
+          <el-table-column prop="caption" label="副标题" width="80"></el-table-column>
+          <el-table-column prop="brandId" label="品牌ID" width="80"></el-table-column>
+          <el-table-column prop="category1Id" label="一级分类" width="80"></el-table-column>
+          <el-table-column prop="category2Id" label="二级分类" width="80"></el-table-column>
+          <el-table-column prop="category3Id" label="三级分类" width="80"></el-table-column>
+          <el-table-column prop="templateId" label="模板ID" width="80"></el-table-column>
+          <el-table-column prop="freightId" label="运费模板id" width="80"></el-table-column>
+          <el-table-column prop="image" label="图片" width="80"></el-table-column>
+          <el-table-column prop="images" label="图片列表" width="80"></el-table-column>
+          <el-table-column prop="saleService" label="售后服务" width="80"></el-table-column>
+          <el-table-column prop="introduction" label="介绍" width="80"></el-table-column>
+          <el-table-column prop="specItems" label="规格列表" width="80"></el-table-column>
+          <el-table-column prop="paraItems" label="参数列表" width="80"></el-table-column>
+          <el-table-column prop="saleNum" label="销量" width="80"></el-table-column>
+          <el-table-column prop="commentNum" label="评论数" width="80"></el-table-column>
+          <el-table-column prop="isMarketable" label="是否上架" width="80"></el-table-column>
+          <el-table-column prop="isEnableSpec" label="是否启用规格" width="80"></el-table-column>
+          <el-table-column prop="isDelete" label="是否删除" width="80"></el-table-column>
+          <el-table-column prop="status" label="审核状态" width="80"></el-table-column>
+
+                    <el-table-column
+                            label="操作"  >
+                        <template slot-scope="scope">
+                            <el-button @click="edit(scope.row.id)" size="mini" type="primary" size="small">修改</el-button>
+                            <el-button @click="dele(scope.row.id)" size="mini" type="danger" size="small">删除</el-button>
+                        </template>
+                    </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+                <el-pagination
+                        class="pagiantion"
+                        @size-change="fetchData"
+                        @current-change="fetchData"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10, 20, 30, 40]"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                </el-pagination>
+            </div>
+            <div class="add-form">
+                <!--弹出窗口-->
+                <el-dialog  title="编辑" :visible.sync="formVisible" >
+                    <el-form label-width="80px">
+                                <el-form-item label="货号"><el-input v-model="pojo.sn"></el-input></el-form-item>
+        <el-form-item label="SPU名"><el-input v-model="pojo.name"></el-input></el-form-item>
+        <el-form-item label="副标题"><el-input v-model="pojo.caption"></el-input></el-form-item>
+        <el-form-item label="品牌ID"><el-input v-model="pojo.brandId"></el-input></el-form-item>
+        <el-form-item label="一级分类"><el-input v-model="pojo.category1Id"></el-input></el-form-item>
+        <el-form-item label="二级分类"><el-input v-model="pojo.category2Id"></el-input></el-form-item>
+        <el-form-item label="三级分类"><el-input v-model="pojo.category3Id"></el-input></el-form-item>
+        <el-form-item label="模板ID"><el-input v-model="pojo.templateId"></el-input></el-form-item>
+        <el-form-item label="运费模板id"><el-input v-model="pojo.freightId"></el-input></el-form-item>
+        <el-form-item label="图片"><el-input v-model="pojo.image"></el-input></el-form-item>
+        <el-form-item label="图片列表"><el-input v-model="pojo.images"></el-input></el-form-item>
+        <el-form-item label="售后服务"><el-input v-model="pojo.saleService"></el-input></el-form-item>
+        <el-form-item label="介绍"><el-input v-model="pojo.introduction"></el-input></el-form-item>
+        <el-form-item label="规格列表"><el-input v-model="pojo.specItems"></el-input></el-form-item>
+        <el-form-item label="参数列表"><el-input v-model="pojo.paraItems"></el-input></el-form-item>
+        <el-form-item label="销量"><el-input v-model="pojo.saleNum"></el-input></el-form-item>
+        <el-form-item label="评论数"><el-input v-model="pojo.commentNum"></el-input></el-form-item>
+        <el-form-item label="是否上架"><el-input v-model="pojo.isMarketable"></el-input></el-form-item>
+        <el-form-item label="是否启用规格"><el-input v-model="pojo.isEnableSpec"></el-input></el-form-item>
+        <el-form-item label="是否删除"><el-input v-model="pojo.isDelete"></el-input></el-form-item>
+        <el-form-item label="审核状态"><el-input v-model="pojo.status"></el-input></el-form-item>
+
+                            <!-- 图片上传代码 如页面有图片上传功能放开注释 ****
+                            <el-form-item label="图片">
+                                <el-upload
+                                        class="avatar-uploader"
+                                        action="/upload/native.do"
+                                        :show-file-list="false"
+                                        :on-success="handleAvatarSuccess"
+                                        :before-upload="beforeAvatarUpload">
+                                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                            </el-form-item>
+                            -->
+
+                            <el-form-item>
+                                <el-button type="primary" @click="save()">保存</el-button>
+                                <el-button @click="formVisible = false" >关闭</el-button>
+                            </el-form-item>
+                    </el-form>
+                </el-dialog>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script src="/js/elementui.js"></script>
+<script>
+     new Vue({
+        el: '#app',
+        data(){
+            return {
+                tableData: [],
+                currentPage: 1,
+                total: 10,
+                size: 10,
+                searchMap: {},
+                pojo: {},
+                formVisible: false,
+                imageUrl: ''
+            }
+        },
+        created(){
+            this.fetchData();
+        },
+        methods:{
+            fetchData (){
+                axios.post(`/spu/findPage.do?page=${this.currentPage}&size=${this.size}`,this.searchMap).then(response => {
+                    this.tableData = response.data.rows;
+                    this.total = response.data.total;
+                });
+            },
+            save (){
+                // this.pojo.image= this.imageUrl; //如页面有图片上传功能放开注释
+                axios.post(`/spu/${this.pojo.id==null?'add':'update'}.do`,this.pojo).then(response => {
+                    this.fetchData (); //刷新列表
+                    this.formVisible = false ;//关闭窗口
+                });
+            },
+            edit (id){
+                this.formVisible = true // 打开窗口
+                // 调用查询
+                axios.get(`/spu/findById.do?id=${id}`).then(response => {
+                    this.pojo = response.data;
+                    // this.imageUrl=this.pojo.image //显示图片  如页面有图片上传功能放开注释
+                })
+            },
+            dele (id){
+                this.$confirm('确定要删除此记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then( () => {
+                    axios.get(`/spu/delete.do?id=${id}`).then(response => {
+                        this.fetchData (); //刷新列表
+                    })
+                })
+            },
+			/* ****图片上传相关代码  如页面有图片上传功能放开注释 **** 
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = file.response;
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            }*/
+        }
+    })
+</script>
+</html>

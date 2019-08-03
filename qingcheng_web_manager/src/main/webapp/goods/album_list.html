@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>相册图片列表</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- 上传图片框样式，不使用上传组件可以删除此样式 -->
+    <style>
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 150px;
+            height: 70px;
+            line-height: 150px;
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 70px;
+            display: block;
+        }
+
+    </style>
+
+
+</head>
+<body class="hold-transition">
+<div id="app">
+
+    <div class="content-header">
+        <h1>管理<small>album管理</small></h1>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>管理</el-breadcrumb-item>
+            <el-breadcrumb-item>album管理</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+
+    <div class="app-container">
+        <div class="box">
+            <div class="filter-container">
+                <el-button type="primary"  class="butT" @click="formVisible=true">新增</el-button>
+                <el-button type="primary"  class="butT" @click="location='album.html'">返回</el-button>
+            </div>
+
+            <el-row>
+                <el-col :span="4" v-for="(item,index) in imageList" :key="o" >
+                    <el-card :body-style="{ padding: '0px' }">
+                        <img :src="item.url" class="image" width="200px" height="200px">
+                        <div style="padding: 14px;">
+                            <div class="bottom clearfix">
+                                <el-button @click="dele(item.url)" size="mini" type="danger" size="small">删除</el-button>
+                            </div>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+
+            <div class="pagination-container">
+                <el-pagination
+                        class="pagiantion"
+                        @size-change="fetchData"
+                        @current-change="fetchData"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10, 20, 30, 40]"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                </el-pagination>
+            </div>
+            <div class="add-form">
+                <!--弹出窗口-->
+                <el-dialog  title="编辑" :visible.sync="formVisible" >
+                    <el-form label-width="80px">
+                            <el-form-item label="图片">
+                                <el-upload
+                                        class="avatar-uploader"
+                                        action="/upload/native.do"
+                                        :show-file-list="false"
+                                        :on-success="handleAvatarSuccess"
+                                        :before-upload="beforeAvatarUpload">
+                                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="save()">保存</el-button>
+                                <el-button @click="formVisible = false" >关闭</el-button>
+                            </el-form-item>
+                    </el-form>
+                </el-dialog>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script src="/js/elementui.js"></script>
+<script src="/js/util.js"></script>
+<script>
+     new Vue({
+        el: '#app',
+        data(){
+            return {
+                tableData: [],
+                currentPage: 1,
+                total: 10,
+                size: 10,
+                searchMap: {},
+                pojo: {},
+                formVisible: false,
+                imageUrl: '',
+                imageList:[]
+            }
+        },
+        created(){
+            let id=getQueryString("id");
+            this.fetchData(id);
+        },
+        methods:{
+            fetchData (id){
+                // 调用查询
+                axios.get(`/album/findById.do?id=${id}`).then(response => {
+                    this.pojo=response.data;
+                    this.imageList = JSON.parse( this.pojo.imageItems);
+                })
+            },
+            save (){
+                this.imageList.push({url:this.imageUrl});  //追加
+                this.pojo.imageItems= JSON.stringify(this.imageList); //保存到实体
+                axios.post(`/album/update.do`,this.pojo).then(response => {  //保存到数据库
+                    this.formVisible = false ;//关闭窗口
+                });
+            },
+            edit (id){
+                this.formVisible = true // 打开窗口
+                // 调用查询
+                axios.get(`/album/findById.do?id=${id}`).then(response => {
+                    this.imageList = JSON.parse( response.data.imageItems);
+                })
+            },
+            list (id){  //图片列表
+                location.href=`album_list.html?id=${id}`;
+            },
+            dele (url){
+                this.$confirm('确定要删除此记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then( () => {
+                    for(let i=0;i<this.imageList.length;i++){
+                        if(this.imageList[i].url==url){
+                            this.imageList.splice(i,1);
+                            break;
+                        }
+                    }
+                    this.pojo.imageItems= JSON.stringify(this.imageList); //保存到实体
+                    axios.post(`/album/update.do`,this.pojo).then(response => {  //保存到数据库
+                        this.formVisible = false ;//关闭窗口
+                    });
+                })
+            },
+			//* ****图片上传相关代码  如页面有图片上传功能放开注释 ****
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = file.response;
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>orderItem管理</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- 上传图片框样式，不使用上传组件可以删除此样式 -->
+    <style>
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 150px;
+            height: 70px;
+            line-height: 150px;
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 70px;
+            display: block;
+        }
+
+    </style>
+</head>
+<body class="hold-transition">
+<div id="app">
+
+    <div class="content-header">
+        <h1>管理<small>orderItem管理</small></h1>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>管理</el-breadcrumb-item>
+            <el-breadcrumb-item>orderItem管理</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+
+    <div class="app-container">
+        <div class="box">
+            <div class="filter-container">
+                <!--查询表单-->
+                <el-form :inline="true" >
+                          <el-form-item label="1级分类">
+<el-input v-model="searchMap.categoryId1" placeholder="1级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="2级分类">
+<el-input v-model="searchMap.categoryId2" placeholder="2级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="3级分类">
+<el-input v-model="searchMap.categoryId3" placeholder="3级分类" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="SPU_ID">
+<el-input v-model="searchMap.spuId" placeholder="SPU_ID" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="SKU_ID">
+<el-input v-model="searchMap.skuId" placeholder="SKU_ID" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="订单ID">
+<el-input v-model="searchMap.orderId" placeholder="订单ID" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="商品名称">
+<el-input v-model="searchMap.name" placeholder="商品名称" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="单价">
+<el-input v-model="searchMap.price" placeholder="单价" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="数量">
+<el-input v-model="searchMap.num" placeholder="数量" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="总金额">
+<el-input v-model="searchMap.money" placeholder="总金额" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="实付金额">
+<el-input v-model="searchMap.payMoney" placeholder="实付金额" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="图片地址">
+<el-input v-model="searchMap.image" placeholder="图片地址" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="重量">
+<el-input v-model="searchMap.weight" placeholder="重量" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="运费">
+<el-input v-model="searchMap.postFee" placeholder="运费" class="filter-item" ></el-input></el-form-item>
+          <el-form-item label="是否退货">
+<el-input v-model="searchMap.isReturn" placeholder="是否退货" class="filter-item" ></el-input></el-form-item>
+
+                <el-button class="dalfBut" @click="fetchData()">查询</el-button>
+                <el-button type="primary"  class="butT" @click="formVisible=true;pojo={}">新增</el-button>
+                </el-form>
+            </div>
+
+            <el-table :data="tableData" border style="width: 100%">
+                          <el-table-column prop="id" label="ID" width="80"></el-table-column>
+          <el-table-column prop="categoryId1" label="1级分类" width="80"></el-table-column>
+          <el-table-column prop="categoryId2" label="2级分类" width="80"></el-table-column>
+          <el-table-column prop="categoryId3" label="3级分类" width="80"></el-table-column>
+          <el-table-column prop="spuId" label="SPU_ID" width="80"></el-table-column>
+          <el-table-column prop="skuId" label="SKU_ID" width="80"></el-table-column>
+          <el-table-column prop="orderId" label="订单ID" width="80"></el-table-column>
+          <el-table-column prop="name" label="商品名称" width="80"></el-table-column>
+          <el-table-column prop="price" label="单价" width="80"></el-table-column>
+          <el-table-column prop="num" label="数量" width="80"></el-table-column>
+          <el-table-column prop="money" label="总金额" width="80"></el-table-column>
+          <el-table-column prop="payMoney" label="实付金额" width="80"></el-table-column>
+          <el-table-column prop="image" label="图片地址" width="80"></el-table-column>
+          <el-table-column prop="weight" label="重量" width="80"></el-table-column>
+          <el-table-column prop="postFee" label="运费" width="80"></el-table-column>
+          <el-table-column prop="isReturn" label="是否退货" width="80"></el-table-column>
+
+                    <el-table-column
+                            label="操作"  >
+                        <template slot-scope="scope">
+                            <el-button @click="edit(scope.row.id)" size="mini" type="primary" size="small">修改</el-button>
+                            <el-button @click="dele(scope.row.id)" size="mini" type="danger" size="small">删除</el-button>
+                        </template>
+                    </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+                <el-pagination
+                        class="pagiantion"
+                        @size-change="fetchData"
+                        @current-change="fetchData"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10, 20, 30, 40]"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                </el-pagination>
+            </div>
+            <div class="add-form">
+                <!--弹出窗口-->
+                <el-dialog  title="编辑" :visible.sync="formVisible" >
+                    <el-form label-width="80px">
+                                <el-form-item label="1级分类"><el-input v-model="pojo.categoryId1"></el-input></el-form-item>
+        <el-form-item label="2级分类"><el-input v-model="pojo.categoryId2"></el-input></el-form-item>
+        <el-form-item label="3级分类"><el-input v-model="pojo.categoryId3"></el-input></el-form-item>
+        <el-form-item label="SPU_ID"><el-input v-model="pojo.spuId"></el-input></el-form-item>
+        <el-form-item label="SKU_ID"><el-input v-model="pojo.skuId"></el-input></el-form-item>
+        <el-form-item label="订单ID"><el-input v-model="pojo.orderId"></el-input></el-form-item>
+        <el-form-item label="商品名称"><el-input v-model="pojo.name"></el-input></el-form-item>
+        <el-form-item label="单价"><el-input v-model="pojo.price"></el-input></el-form-item>
+        <el-form-item label="数量"><el-input v-model="pojo.num"></el-input></el-form-item>
+        <el-form-item label="总金额"><el-input v-model="pojo.money"></el-input></el-form-item>
+        <el-form-item label="实付金额"><el-input v-model="pojo.payMoney"></el-input></el-form-item>
+        <el-form-item label="图片地址"><el-input v-model="pojo.image"></el-input></el-form-item>
+        <el-form-item label="重量"><el-input v-model="pojo.weight"></el-input></el-form-item>
+        <el-form-item label="运费"><el-input v-model="pojo.postFee"></el-input></el-form-item>
+        <el-form-item label="是否退货"><el-input v-model="pojo.isReturn"></el-input></el-form-item>
+
+                            <!-- 图片上传代码 如页面有图片上传功能放开注释 ****
+                            <el-form-item label="图片">
+                                <el-upload
+                                        class="avatar-uploader"
+                                        action="/upload/native.do"
+                                        :show-file-list="false"
+                                        :on-success="handleAvatarSuccess"
+                                        :before-upload="beforeAvatarUpload">
+                                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                            </el-form-item>
+                            -->
+
+                            <el-form-item>
+                                <el-button type="primary" @click="save()">保存</el-button>
+                                <el-button @click="formVisible = false" >关闭</el-button>
+                            </el-form-item>
+                    </el-form>
+                </el-dialog>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script src="/js/elementui.js"></script>
+<script>
+     new Vue({
+        el: '#app',
+        data(){
+            return {
+                tableData: [],
+                currentPage: 1,
+                total: 10,
+                size: 10,
+                searchMap: {},
+                pojo: {},
+                formVisible: false,
+                imageUrl: ''
+            }
+        },
+        created(){
+            this.fetchData();
+        },
+        methods:{
+            fetchData (){
+                axios.post(`/orderItem/findPage.do?page=${this.currentPage}&size=${this.size}`,this.searchMap).then(response => {
+                    this.tableData = response.data.rows;
+                    this.total = response.data.total;
+                });
+            },
+            save (){
+                // this.pojo.image= this.imageUrl; //如页面有图片上传功能放开注释
+                axios.post(`/orderItem/${this.pojo.id==null?'add':'update'}.do`,this.pojo).then(response => {
+                    this.fetchData (); //刷新列表
+                    this.formVisible = false ;//关闭窗口
+                });
+            },
+            edit (id){
+                this.formVisible = true // 打开窗口
+                // 调用查询
+                axios.get(`/orderItem/findById.do?id=${id}`).then(response => {
+                    this.pojo = response.data;
+                    // this.imageUrl=this.pojo.image //显示图片  如页面有图片上传功能放开注释
+                })
+            },
+            dele (id){
+                this.$confirm('确定要删除此记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then( () => {
+                    axios.get(`/orderItem/delete.do?id=${id}`).then(response => {
+                        this.fetchData (); //刷新列表
+                    })
+                })
+            },
+			/* ****图片上传相关代码  如页面有图片上传功能放开注释 **** 
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = file.response;
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            }*/
+        }
+    })
+</script>
+</html>

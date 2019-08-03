@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <title>青橙</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="css/theme-chalk.css">
+    <link rel="stylesheet" href="css/login_style.css">
+</head>
+
+<body class="mainBg">
+    <div id="app">
+	<form class="loginForm clear" action="/login" method="POST">
+        <div class="loginMain">
+          <div class="loginlogo"></div>
+          <div class="loginCon">
+            
+              <span class="el-form-item">
+                <span class="userIcon"></span>
+                <span class="el-input">
+                  <input class="el-input__inner" name="username" placeholder="管理员账号"/>
+                </span>
+              </span>
+              <span class="el-form-item">
+                <span class="pwdIcon"></span>
+                <span class="el-input">
+                  <input class="el-input__inner" name="password"  placeholder="密码"/>
+                </span>
+                
+              </span>
+      
+          </div>
+   
+          <div class="loginBtn">            
+              <input type="submit" class="el-button el-button--primary" value="登录">
+            </div>
+        </div>
+	</form>
+            
+    </div>
+</body>
+<!-- 引入组件库 
+<script src="js/vue.js"></script>
+<script src="js/elementui.js"></script>-->
+<script>
+    window.onload = windowHeight; //页面载入完毕执行函数
+    function windowHeight() {
+        var asieHeight=document.getElementById("app")
+        asieHeight.style.height=document.documentElement.clientHeight + 'px'
+    } 
+</script>
+</html>
